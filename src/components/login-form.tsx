@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  EnvelopeClosedIcon,
+  LightningBoltIcon,
+  MagicWandIcon,
+} from "@radix-ui/react-icons";
 import Link from "next/link";
 
 export function LoginForm() {
@@ -31,15 +36,33 @@ export function LoginForm() {
               required
             />
           </div>
-          <Button type="submit" className="w-full">
-            Email me magic link
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+              <Link href="#" className="ml-auto inline-block text-sm underline">
+                Forgot your password?
+              </Link>
+            </div>
+            <Input id="password" type="password" required />
+          </div>
+          <Button className="w-full">
+            <LightningBoltIcon />
+            Login
           </Button>
-          <Button
-            variant="outline"
-            className="w-full text-red-500 border-red-400"
-          >
-            Login with Google
-          </Button>
+          <div className="flex w-full gap-2">
+            <Button
+              variant="outline"
+              className="w-full text-red-500 border-red-400"
+            >
+              <EnvelopeClosedIcon /> Google
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full text-purple-500 border-purple-400"
+            >
+              <MagicWandIcon /> Magic Link
+            </Button>
+          </div>
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}

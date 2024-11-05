@@ -1,0 +1,103 @@
+services:
+  traefik:
+    image: traefik:v3.2.0
+    command: "--configFile=/config/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./traefik_data:/etc/traefik"
+      - "./config/traefikdev/configuration.yml:/config/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./localhost.crt:/certs/localhost.crt:ro"
+      - "./localhost.key:/certs/localhost.key:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`proxy.localhost`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    networks:
+      - supareel_net
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5488:5432"
+    environment:
+      POSTGRES_USER: ${PG_USER:-supareel_user}
+      POSTGRES_PASSWORD: ${PG_PASS:-supareel_pass}
+      POSTGRES_DB: ${PG_DB:-supareel_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supareel_user -d supareel_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - supareel_net
+
+  listmonk:
+    image: 'listmonk/listmonk:v4.0.1'
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      LISTMONK_app__address: 0.0.0.0:9000
+      LISTMONK_db__user:  ${PG_USER:-supareel_user}
+      LISTMONK_db__password: ${PG_PASS:-supareel_pass}
+      LISTMONK_db__database: ${LISTMONK_PG_DB:-listmonk}
+      LISTMONK_db__host: postgres
+      LISTMONK_db__port: 5432
+      LISTMONK_db__ssl_mode: disable
+      LISTMONK_db__max_open: 25
+      LISTMONK_db__max_idle: 25
+      LISTMONK_db__max_lifetime: 300s
+      TZ: Etc/UTC
+      LISTMONK_ADMIN_USER: ${LISTMONK_ADMIN_USER:-admin}
+      LISTMONK_ADMIN_PASSWORD: ${LISTMONK_ADMIN_PASSWORD:-admin}
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '-q'
+        - '--spider'
+        - 'http://127.0.0.1:9000'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.listmonk.rule=Host(`listmonk.localhost`)"
+      - "traefik.http.routers.listmonk.entrypoints=websecure"
+      - "traefik.http.services.listmonk.loadbalancer.server.port=9000"
+    volumes:
+      - 'listmonk_data:/listmonk/uploads:rw'
+    networks:
+      - supareel_net
+
+  listmonk-initial-database-setup:
+    image: 'listmonk/listmonk:v4.0.1'
+    command: './listmonk --install --yes --idempotent'
+    restart: 'no'
+    depends_on:
+      - postgres
+    environment:
+      LISTMONK_db__host: postgres
+      LISTMONK_db__name: listmonk
+      LISTMONK_db__user: ${PG_USER:-supareel_user}
+      LISTMONK_db__password: ${PG_PASS:-supareel_pass}
+      LISTMONK_db__port: 5432
+    networks:
+      - supareel_net
+
+networks:
+  supareel_net:
+    external: true
+
+volumes:
+  postgres_data:
+  listmonk_data:
+  traefik_data:

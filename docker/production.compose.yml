@@ -1,0 +1,94 @@
+services:
+  traefik:
+    image: traefik:v3.2.0
+    environment:
+      - CF_DNS_API_TOKEN=rL5XSvSAloR-37iz1Cc900Y9I1Lnf3dkGxGDrNAL
+      - CF_API_EMAIL=19mandal97@gmail.com
+    command:
+      - "--configFile=/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${PWD}/config/traefik/fileConfig.yml:/fileConfig.yml:ro"
+      - "${PWD}/config/traefik/configuration.yml:/traefik.yml:ro"
+      - "${PWD}/traefik_data:/etc/traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`proxy.supareel.com`)"
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.tls.certresolver=supareelcfchallenge"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    networks:
+      - supareel_net
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_USER:-supareel_user}
+      POSTGRES_PASSWORD: ${PG_PASS:-supareel_pass}
+      POSTGRES_DB: ${PG_DB:-supareel_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supareel_user -d supareel_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - supareel_net
+
+  listmonk:
+    image: 'listmonk/listmonk:v4.0.1'
+    container_name: listmonk_supareel_dev
+    restart: unless-stopped
+    environment:
+      LISTMONK_app__address: 0.0.0.0:9000
+      LISTMONK_db__user:  ${PG_USER:-supareel_user}
+      LISTMONK_db__password: ${PG_PASS:-supareel_pass}
+      LISTMONK_db__database: ${LISTMONK_PG_DB:-listmonk}
+      LISTMONK_db__host: postgres
+      LISTMONK_db__port: 5432
+      LISTMONK_db__ssl_mode: disable
+      LISTMONK_db__max_open: 25
+      LISTMONK_db__max_idle: 25
+      LISTMONK_db__max_lifetime: 300s
+      TZ: Etc/UTC
+      LISTMONK_ADMIN_USER: ${LISTMONK_ADMIN_USER:-}
+      LISTMONK_ADMIN_PASSWORD: ${LISTMONK_ADMIN_PASSWORD:-}
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '-q'
+        - '--spider'
+        - 'http://127.0.0.1:9000'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    labels:
+      - 'traefik.http.routers.listmonk.dev.rule=Host(`coolify.supareel.com`) && PathPrefix(`/`)'
+      - traefik.http.routers.listmonk.dev.entryPoints=http
+    volumes:
+      - 'listmonk_data:/listmonk/uploads:rw'
+
+  listmonk-initial-database-setup:
+    image: 'listmonk/listmonk:v4.0.1'
+    command: './listmonk --install --yes --idempotent'
+    restart: 'no'
+    environment:
+      - LISTMONK_db__host=${LISTMONK_PGDB_HOST:-postgres}
+      - LISTMONK_db__name=${LISTMONK_PGDB_DATABASE:-listmonk}
+      - LISTMONK_db__user=${LISTMONK_PGDB_USER:-postgres}
+      - LISTMONK_db__password=${LISTMONK_PGDB_PASSWORD:-}
+      - LISTMONK_db__port=${LISTMONK_PGDB_PORT:-5432}
+networks:
+  supareel_net:
+    external: true
+
+volumes:
+  postgres_data:
+  listmonk_data:

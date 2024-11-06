@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CHECK_MAIL_PAGE } from "@/routes";
 
 export function SignupForm() {
   const [email, setEmail] = useState("");
@@ -30,34 +31,32 @@ export function SignupForm() {
       return;
     }
 
-    const { data, error } = await authClient.signUp.email(
-      {
-        email: email,
-        password: password,
-        name: name,
-        callbackURL: "/dashboard", //redirect after successful login (optional)
+    const payload = {
+      email: email,
+      password: password,
+      name: name,
+      callbackURL: CHECK_MAIL_PAGE, //redirect after successful login (optional)
+    };
+
+    const { data, error } = await authClient.signUp.email(payload, {
+      onRequest: (ctx) => {
+        //show loading
+        console.log("onRequest", ctx);
+        setLoading(true);
       },
-      {
-        onRequest: (ctx) => {
-          //show loading
-          setLoading(true);
-        },
-        onSuccess: (ctx) => {
-          setLoading(false);
-          //redirect to the dashboard
-        },
-        onError: (ctx) => {
-          alert(ctx.error.message);
-        },
-      }
-    );
+      onSuccess: (ctx) => {
+        setLoading(false);
+        console.log("onSuccess", ctx);
+        //redirect to the dashboard
+      },
+      onError: (ctx) => {
+        setLoading(false);
+        console.log("onError", ctx);
+        alert(`${error?.status} ${error?.message}`);
+      },
+    });
 
     console.log(data?.session, error);
-
-    if (error?.statusText !== "OK") {
-      alert(`${error?.status} ${error?.message}`);
-      return;
-    }
   };
   return (
     <Card className="mx-auto max-w-sm">

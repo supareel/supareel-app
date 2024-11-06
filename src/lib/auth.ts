@@ -1,20 +1,38 @@
-import { db } from "@/lib/db"; // your drizzle instance
+import { db } from "@/lib/db/db"; // your drizzle instance
+import { schema } from "@/lib/db/schema";
+import { sendAuthMagicLinkEmail } from "@/lib/sendgrid";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink } from "better-auth/plugins";
+import { emailOTP, magicLink } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: {
+      ...schema,
+    },
+    usePlural: true,
   }),
+  emailAndPassword: {
+    enabled: true,
+    sendOnSignUp: true,
+  },
   plugins: [
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        // Implement the sendVerificationOTP method to send the OTP to the user's email address
+        console.log(`Sending OTP to ${email}: ${otp} - ${type}`);
+      },
+    }),
     magicLink({
       sendMagicLink: async (data: {
         email: string;
-        token: string;
         url: string;
+        token: string;
       }) => {
-        // send email to user
+        // TODO: send the magic link
+        sendAuthMagicLinkEmail(data.email, data.url, data.token);
+        console.log(data);
       },
     }),
   ],

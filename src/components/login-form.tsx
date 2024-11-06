@@ -1,3 +1,4 @@
+"use client";
 import { uiRoutes } from "@/app/data/routes";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authClient } from "@/lib/auth-client";
+import { CHECK_MAIL_PAGE } from "@/routes";
 import {
   EnvelopeClosedIcon,
   LightningBoltIcon,
@@ -17,6 +20,13 @@ import {
 import Link from "next/link";
 
 export function LoginForm() {
+  const signInGoogle = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: CHECK_MAIL_PAGE,
+    });
+    console.log(data);
+  };
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -53,6 +63,7 @@ export function LoginForm() {
             <Button
               variant="outline"
               className="w-full text-red-500 border-red-400"
+              onClick={signInGoogle}
             >
               <EnvelopeClosedIcon /> Google
             </Button>

@@ -1,12 +1,16 @@
-import { date, pgTable, text } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { user } from "./user";
 
-export const account = pgTable("accounts", {
-  id: text().primaryKey(),
-  userId: text().notNull(),
-  accountId: text().notNull(),
-  providerId: text().notNull(),
-  accessToken: text(),
-  refreshToken: text(),
-  expiresAt: date().notNull(),
-  password: text(),
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("accountId").notNull(),
+  providerId: text("providerId").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id),
+  accessToken: text("accessToken"),
+  refreshToken: text("refreshToken"),
+  idToken: text("idToken"),
+  expiresAt: timestamp("expiresAt"),
+  password: text("password"),
 });

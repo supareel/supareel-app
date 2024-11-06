@@ -11,11 +11,22 @@ export const auth = betterAuth({
     schema: {
       ...schema,
     },
-    usePlural: true,
   }),
   emailAndPassword: {
     enabled: true,
     sendOnSignUp: true,
+  },
+  emailVerification: {
+    sendVerificationEmail: async (user, url, token) => {
+      console.log(user, url, token);
+      await sendAuthMagicLinkEmail(user.email, url, token);
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    },
   },
   plugins: [
     emailOTP({
@@ -31,15 +42,9 @@ export const auth = betterAuth({
         token: string;
       }) => {
         // TODO: send the magic link
-        sendAuthMagicLinkEmail(data.email, data.url, data.token);
+        await sendAuthMagicLinkEmail(data.email, data.url, data.token);
         console.log(data);
       },
     }),
   ],
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    },
-  },
 });

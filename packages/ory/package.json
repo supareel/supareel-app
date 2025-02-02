@@ -1,0 +1,27 @@
+{
+  "name": "@repo/ory",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./sdk/client": {
+      "types": "./sdk/client/index.ts",
+      "default": "./sdk/client/index.ts"
+    },
+    "./sdk/server": {
+      "types": "./sdk/server/index.ts",
+      "default": "./sdk/server/index.ts"
+    },
+    "./hooks": {
+      "types": "./hooks.tsx",
+      "default": "./hooks.tsx"
+    }
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@ory/client": "^1.16.5"
+  }
+}

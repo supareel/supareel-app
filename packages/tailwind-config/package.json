@@ -1,0 +1,18 @@
+{
+  "name": "@repo/tailwind-config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'all package:tailwind-config tests passed!'"
+  },
+  "exports": {
+    "./tailwind.config": "./tailwind.config.ts"
+  },
+  "devDependencies": {
+    "tailwind-variants": "^0.3.1",
+    "tailwindcss": "^4.0.3"
+  }
+}

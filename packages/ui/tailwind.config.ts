@@ -1,16 +1,9 @@
-import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
+import sharedConfig from "@repo/tailwind-config/tailwind.config";
+import { Config } from "tailwindcss";
 
-const config = {
-  darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-    "../../packages/ui/src/**/*.{ts,tsx}",
-  ],
-  prefix: "",
+/** @type {import('tailwindcss').Config} */
+const config: Pick<Config, "presets" | "theme" | "plugins"> = {
+  presets: [sharedConfig],
   theme: {
     container: {
       center: true,
@@ -62,12 +55,12 @@ const config = {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
+          from: { height: "0px" },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          to: { height: "0px" },
         },
       },
       animation: {
@@ -76,7 +69,7 @@ const config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
-} satisfies Config;
+  plugins: [require("tailwindcss-animate")],
+};
 
 export default config;

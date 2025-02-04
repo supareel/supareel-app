@@ -18,7 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { AUTH_LOGIN_PAGE, AUTH_VERIFICATION_PAGE } from "../routes";
+import { AUTH_LOGIN_PAGE, AUTH_VERIFICATION_PAGE } from "../../routes";
 
 export default function Verification() {
   const [flow, setFlow] = useState<VerificationFlow>();

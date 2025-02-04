@@ -1,6 +1,6 @@
 "use client";
 
-import { AUTH_LOGIN_PAGE } from "@/app/auth/routes";
+import { AUTH_LOGIN_PAGE } from "@/app/routes";
 import { Button } from "@/components/ui/button";
 import {
   CardContent,

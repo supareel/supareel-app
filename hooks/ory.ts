@@ -3,7 +3,7 @@
 import { AxiosError } from "axios";
 import React, { DependencyList, useEffect, useState } from "react";
 
-import { AUTH_ERROR_PAGE, AUTH_LOGIN_PAGE } from "@/app/auth/routes";
+import { AUTH_ERROR_PAGE, AUTH_LOGIN_PAGE } from "@/app/routes";
 import { kratos } from "@/lib/ory/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 

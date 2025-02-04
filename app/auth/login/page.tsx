@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  AUTH_LOGIN_PAGE,
+  AUTH_RECOVERY_PAGE,
+  AUTH_REGISTRATION_PAGE,
+  HOME_PAGE,
+} from "@/app/routes";
 import { Flow } from "@/components/ory/Flow";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +24,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import {
-  AUTH_LOGIN_PAGE,
-  AUTH_RECOVERY_PAGE,
-  AUTH_REGISTRATION_PAGE,
-} from "../routes";
 
 export default function Login() {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -70,7 +71,8 @@ export default function Login() {
         .createBrowserLoginFlow({ aal, refresh, returnTo, loginChallenge })
         .then(({ data }) => {
           setFlow(data);
-          router.push(`?flow=${data.id}`);
+          alert("Login successful 1!");
+          router.push(`${HOME_PAGE}?flow=${data.id}`);
         })
         .catch(handleError);
     },
@@ -88,7 +90,8 @@ export default function Login() {
           window.location.href = flow?.return_to;
           return;
         }
-        router.push("/");
+        alert("Login successful!");
+        router.push(HOME_PAGE);
       })
       .catch(handleError);
   };
@@ -99,10 +102,11 @@ export default function Login() {
     }
 
     if (flowId) {
+      alert("Getting flow");
       getFlow(flowId).then();
       return;
     }
-
+    alert("Getting createFlow");
     createFlow(aal, refresh, returnTo, loginChallenge);
   }, [
     flowId,

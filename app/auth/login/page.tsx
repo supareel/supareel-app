@@ -71,7 +71,9 @@ export default function Login() {
         .createBrowserLoginFlow({ aal, refresh, returnTo, loginChallenge })
         .then(({ data }) => {
           setFlow(data);
-          alert("Login successful 1!");
+          console.log("Flow created:", data);
+          alert(`Login successful! data.id: ${data.id}`);
+
           router.push(`${HOME_PAGE}?flow=${data.id}`);
         })
         .catch(handleError);
@@ -86,11 +88,11 @@ export default function Login() {
         updateLoginFlowBody: body,
       })
       .then(() => {
+        alert(`Login successful! return_to: ${flow?.return_to}`);
         if (flow?.return_to) {
           window.location.href = flow?.return_to;
           return;
         }
-        alert("Login successful!");
         router.push(HOME_PAGE);
       })
       .catch(handleError);
@@ -102,11 +104,9 @@ export default function Login() {
     }
 
     if (flowId) {
-      alert("Getting flow");
       getFlow(flowId).then();
       return;
     }
-    alert("Getting createFlow");
     createFlow(aal, refresh, returnTo, loginChallenge);
   }, [
     flowId,

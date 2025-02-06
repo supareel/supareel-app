@@ -28,8 +28,10 @@ function FeedPost({ email, name, avatar }: FeedPostProps) {
             <span className="text-slate-400 text-sm">Feb, 5</span>
           </div>
           <p className="mt-0.5 mb-3" style={{ fontSize: "15px" }}>
-            {email} {email} {email} {email} {email} {email}
-            {email} {email} {email}
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga ipsam
+            nam quaerat culpa ipsum laborum reprehenderit natus beatae corrupti
+            cupiditate cumque at, dolorum totam. Dignissimos quos corporis eius.
+            Soluta, sit!
           </p>
         </div>
       </div>

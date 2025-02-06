@@ -30,7 +30,6 @@ export default async function HomePage() {
           <AnnouncementPost
             email={user?.primaryEmailAddress?.emailAddress}
             name={user?.fullName}
-            avatar={user?.imageUrl}
           />
           <FeedPost
             email={user?.primaryEmailAddress?.emailAddress}

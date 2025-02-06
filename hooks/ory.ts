@@ -1,17 +1,16 @@
 "use client";
-
-import { AxiosError } from "axios";
-import React, { DependencyList, useEffect, useState } from "react";
-
 import { AUTH_ERROR_PAGE, AUTH_LOGIN_PAGE } from "@/app/routes";
 import { kratos } from "@/lib/ory/client";
+import { Session } from "@ory/client";
+import { AxiosError } from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import React, { DependencyList, useEffect, useState } from "react";
 
 export const HandleError = (
   getFlow:
     | ((flowId: string) => Promise<void | AxiosError>)
     | undefined = undefined,
-  setFlow: React.Dispatch<React.SetStateAction<any>> | undefined = undefined,
+  setFlow: React.Dispatch<React.SetStateAction<never>> | undefined = undefined,
   defaultNav: string | undefined = undefined,
   fatalToError = false,
   router: AppRouterInstance
@@ -19,11 +18,14 @@ export const HandleError = (
   return async (
     error: AxiosError<any, unknown>
   ): Promise<AxiosError | void> => {
-    const responseData = error.response?.data || {};
+    const responseData = error.response?.data;
 
     switch (error.response?.status) {
       case 400: {
-        if (responseData.error?.id == "session_already_available") {
+        if (
+          responseData &&
+          responseData.error?.id == "session_already_available"
+        ) {
           router.push("/");
           return Promise.resolve();
         }
@@ -193,4 +195,21 @@ export function LogoutLink(deps?: DependencyList) {
         .then(() => (window.location.href = AUTH_LOGIN_PAGE));
     }
   };
+}
+
+export function useSession(sessionToken: string) {
+  // Fetch user session
+  const [session, setSession] = useState<Session>();
+
+  useEffect(() => {
+    kratos
+      .toSession({
+        cookie: `ory_kratos_session=${sessionToken}`,
+      })
+      .then(({ data }) => {
+        setSession(data);
+      });
+  }, [sessionToken]);
+
+  return session;
 }

@@ -1,30 +1,12 @@
-import { getFrontendApi } from "@/lib/ory/server";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
-export async function middleware(req: NextRequest) {
-  try {
-    // Extract session cookie
-    const sessionCookie = req.cookies.get("ory_kratos_session");
-    if (!sessionCookie) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+export default clerkMiddleware();
 
-    // Fetch user session
-    const kratos = await getFrontendApi();
-    const { data: session } = await kratos.toSession({
-      cookie: `ory_kratos_session=${sessionCookie.value}`,
-    });
-
-    console.log("Authenticated User:", session?.identity);
-    return NextResponse.next(); // Allow request to proceed
-  } catch (error) {
-    console.error("Session validation failed:", error);
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-}
-
-// Apply middleware to protected routes
 export const config = {
-  matcher: ["/home/:path*"], // Protect these routes
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

@@ -1,5 +1,6 @@
 import HomePageClient from "@/app/page.client";
 
+
 export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center h-screen mx-auto max-w-2xl text-center">

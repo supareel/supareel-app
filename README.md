@@ -1,3 +1,5 @@
+# Supareel
+
 Indie Hacking | Building Supareel | Community management tool for online educators
 
 ![Admin Home Page](https://raw.githubusercontent.com/supareel/supareel-app/refs/heads/main/resources/home-ss.png)
